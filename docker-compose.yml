@@ -1,0 +1,179 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database for Rails autodialer application
+  postgres:
+    image: postgres:15-alpine
+    container_name: aeroleads-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: autodialer_development
+    ports:
+      - "5432:5432"
+    volumes:
+      # Windows-compatible volume mount using named volume
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aeroleads-network
+
+  # Redis for job queuing (Sidekiq)
+  redis:
+    image: redis:7-alpine
+    container_name: aeroleads-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      # Windows-compatible volume mount using named volume
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aeroleads-network
+
+  # LinkedIn Scraper (Python)
+  scraper:
+    build:
+      context: ./linkedin_scraper
+      dockerfile: Dockerfile
+    container_name: aeroleads-scraper
+    volumes:
+      # Windows-compatible bind mount - works with both forward slashes and backslashes
+      - ./linkedin_scraper:/app
+      # Named volume for Python cache
+      - scraper_cache:/root/.cache
+    environment:
+      - HEADLESS=true
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - ./linkedin_scraper/.env
+    working_dir: /app
+    command: python -m scraper.runner --input input_urls.txt --out profiles.csv --dry-run
+    networks:
+      - aeroleads-network
+    profiles:
+      - scraper
+
+  # Autodialer Rails Application
+  autodialer:
+    build:
+      context: ./autodialer
+      dockerfile: Dockerfile
+    container_name: aeroleads-autodialer
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      # Windows-compatible bind mount
+      - ./autodialer:/app
+      # Named volume for bundle cache
+      - bundle_cache:/usr/local/bundle
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/autodialer_development
+      - REDIS_URL=redis://redis:6379/0
+      - RAILS_ENV=development
+      - RAILS_LOG_TO_STDOUT=true
+    env_file:
+      - ./autodialer/.env
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    command: >
+      bash -c "
+        bundle install &&
+        rails db:create db:migrate &&
+        rails server -b 0.0.0.0
+      "
+    networks:
+      - aeroleads-network
+    profiles:
+      - autodialer
+
+  # Sidekiq worker for background jobs
+  sidekiq:
+    build:
+      context: ./autodialer
+      dockerfile: Dockerfile
+    container_name: aeroleads-sidekiq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      # Windows-compatible bind mount
+      - ./autodialer:/app
+      # Shared bundle cache with autodialer
+      - bundle_cache:/usr/local/bundle
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/autodialer_development
+      - REDIS_URL=redis://redis:6379/0
+      - RAILS_ENV=development
+    env_file:
+      - ./autodialer/.env
+    working_dir: /app
+    command: bundle exec sidekiq
+    networks:
+      - aeroleads-network
+    profiles:
+      - autodialer
+
+  # AI Blog Generator (Next.js)
+  blog:
+    build:
+      context: ./ai_blog_generator
+      dockerfile: Dockerfile
+    container_name: aeroleads-blog
+    volumes:
+      # Windows-compatible bind mount
+      - ./ai_blog_generator:/app
+      # Named volume for node_modules (better performance on Windows)
+      - node_modules:/app/node_modules
+      # Named volume for Next.js cache
+      - nextjs_cache:/app/.next
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./ai_blog_generator/.env
+    ports:
+      - "3001:3000"
+    working_dir: /app
+    command: >
+      sh -c "
+        npm install &&
+        npm run dev
+      "
+    networks:
+      - aeroleads-network
+    profiles:
+      - blog
+
+# Named volumes for Windows compatibility and better performance
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  bundle_cache:
+    driver: local
+  node_modules:
+    driver: local
+  nextjs_cache:
+    driver: local
+  scraper_cache:
+    driver: local
+
+# Dedicated network for service communication
+networks:
+  aeroleads-network:
+    driver: bridge

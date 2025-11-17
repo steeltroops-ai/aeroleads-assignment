@@ -1,0 +1,68 @@
+{
+    "calls": [
+        {
+            "contact_phone": "+18005551001",
+            "contact_name": "Customer Service Test 1",
+            "status": "completed",
+            "duration": 45,
+            "cost": 0.00975,
+            "started_at": "2024-01-15T14:30:00Z",
+            "ended_at": "2024-01-15T14:30:45Z",
+            "twilio_sid": "CA1234567890abcdef1234567890abcdef",
+            "error_message": null
+        },
+        {
+            "contact_phone": "+18005551002",
+            "contact_name": "Customer Service Test 2",
+            "status": "completed",
+            "duration": 60,
+            "cost": 0.013,
+            "started_at": "2024-01-15T14:31:00Z",
+            "ended_at": "2024-01-15T14:32:00Z",
+            "twilio_sid": "CA1234567890abcdef1234567890abcde2",
+            "error_message": null
+        },
+        {
+            "contact_phone": "+18005551003",
+            "contact_name": "Customer Service Test 3",
+            "status": "no_answer",
+            "duration": 0,
+            "cost": 0.0,
+            "started_at": "2024-01-15T14:32:00Z",
+            "ended_at": "2024-01-15T14:32:30Z",
+            "twilio_sid": "CA1234567890abcdef1234567890abcde3",
+            "error_message": "No answer after 30 seconds"
+        },
+        {
+            "contact_phone": "+18885551004",
+            "contact_name": "Support Line Test 4",
+            "status": "completed",
+            "duration": 120,
+            "cost": 0.026,
+            "started_at": "2024-01-15T14:33:00Z",
+            "ended_at": "2024-01-15T14:35:00Z",
+            "twilio_sid": "CA1234567890abcdef1234567890abcde4",
+            "error_message": null
+        },
+        {
+            "contact_phone": "+18885551005",
+            "contact_name": "Support Line Test 5",
+            "status": "failed",
+            "duration": 0,
+            "cost": 0.0,
+            "started_at": "2024-01-15T14:35:00Z",
+            "ended_at": "2024-01-15T14:35:10Z",
+            "twilio_sid": null,
+            "error_message": "Connection timeout"
+        }
+    ],
+    "summary": {
+        "total_calls": 5,
+        "completed": 3,
+        "failed": 1,
+        "no_answer": 1,
+        "total_duration": 225,
+        "total_cost": 0.04875,
+        "success_rate": 0.6
+    }
+}

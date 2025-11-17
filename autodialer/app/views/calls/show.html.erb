@@ -1,0 +1,241 @@
+<div class="w-full max-w-4xl mx-auto">
+  <!-- Header with Back Button -->
+  <div class="mb-6">
+    <%= link_to calls_path, class: "inline-flex items-center text-blue-600 hover:text-blue-800 mb-4" do %>
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Dashboard
+    <% end %>
+    <h1 class="text-4xl font-bold text-gray-900">Call Details</h1>
+  </div>
+
+  <!-- Call Information Card -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900">Call Information</h2>
+    </div>
+    
+    <div class="px-6 py-6">
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Status -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Status</dt>
+          <dd>
+            <% status_colors = {
+              "pending" => "bg-gray-100 text-gray-800",
+              "queued" => "bg-blue-100 text-blue-800",
+              "in_progress" => "bg-yellow-100 text-yellow-800",
+              "completed" => "bg-green-100 text-green-800",
+              "failed" => "bg-red-100 text-red-800",
+              "no_answer" => "bg-orange-100 text-orange-800",
+              "busy" => "bg-purple-100 text-purple-800",
+              "canceled" => "bg-gray-100 text-gray-800"
+            } %>
+            <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <%= status_colors[@call.status] || 'bg-gray-100 text-gray-800' %>">
+              <%= @call.status.titleize %>
+            </span>
+          </dd>
+        </div>
+
+        <!-- Twilio SID -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Twilio Call SID</dt>
+          <dd class="text-sm text-gray-900 font-mono"><%= @call.twilio_sid || "Not assigned yet" %></dd>
+        </div>
+
+        <!-- Duration -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Duration</dt>
+          <dd class="text-sm text-gray-900">
+            <%= @call.duration ? "#{@call.duration} seconds" : "N/A" %>
+          </dd>
+        </div>
+
+        <!-- Cost -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Cost</dt>
+          <dd class="text-sm text-gray-900">
+            <%= @call.cost ? "$#{number_with_precision(@call.cost, precision: 4)}" : "N/A" %>
+          </dd>
+        </div>
+
+        <!-- Created At -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Created</dt>
+          <dd class="text-sm text-gray-900">
+            <%= @call.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+            <span class="text-gray-500">(<%= time_ago_in_words(@call.created_at) %> ago)</span>
+          </dd>
+        </div>
+
+        <!-- Started At -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Started</dt>
+          <dd class="text-sm text-gray-900">
+            <%= @call.started_at ? @call.started_at.strftime("%B %d, %Y at %I:%M %p") : "Not started yet" %>
+          </dd>
+        </div>
+
+        <!-- Ended At -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Ended</dt>
+          <dd class="text-sm text-gray-900">
+            <%= @call.ended_at ? @call.ended_at.strftime("%B %d, %Y at %I:%M %p") : "Not ended yet" %>
+          </dd>
+        </div>
+
+        <!-- Updated At -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Last Updated</dt>
+          <dd class="text-sm text-gray-900">
+            <%= @call.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+          </dd>
+        </div>
+      </dl>
+
+      <!-- Error Message (if any) -->
+      <% if @call.error_message.present? %>
+        <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h3 class="text-sm font-medium text-red-800 mb-2">Error Message</h3>
+          <p class="text-sm text-red-700"><%= @call.error_message %></p>
+        </div>
+      <% end %>
+
+      <!-- Scheduled Time -->
+      <% if @call.scheduled_at.present? %>
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 class="text-sm font-medium text-blue-800 mb-2">Scheduled Call</h3>
+          <p class="text-sm text-blue-700">
+            This call is scheduled for <%= @call.scheduled_at.strftime("%B %d, %Y at %I:%M %p") %>
+            <% if @call.scheduled? %>
+              <span class="ml-2 px-2 py-1 bg-blue-200 text-blue-900 rounded text-xs">Pending</span>
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+
+      <!-- Message -->
+      <% if @call.message.present? %>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-gray-500 mb-2">Call Message</h3>
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-900"><%= @call.message %></p>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Recording -->
+      <% if @call.has_recording? %>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-gray-500 mb-2">Call Recording</h3>
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <p class="text-sm text-gray-700">
+                  <span class="font-semibold">Duration:</span> <%= @call.recording_duration %> seconds
+                </p>
+                <p class="text-sm text-gray-500 mt-1">Recorded on <%= @call.ended_at&.strftime("%B %d, %Y") %></p>
+              </div>
+              <% if @call.recording_available? %>
+                <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">Available</span>
+              <% end %>
+            </div>
+            
+            <% if @call.recording_available? %>
+              <audio controls class="w-full mt-3">
+                <source src="<%= @call.recording_url %>" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
+              
+              <div class="mt-3 flex gap-2">
+                <%= link_to "Download Recording", @call.recording_url, 
+                    download: "call_#{@call.id}_recording.mp3",
+                    class: "inline-flex items-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition" do %>
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  Download
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-sm text-gray-500 italic">Recording is being processed...</p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Contact Information Card -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900">Contact Information</h2>
+    </div>
+    
+    <div class="px-6 py-6">
+      <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Name -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Name</dt>
+          <dd class="text-sm text-gray-900"><%= @call.contact.name || "Not provided" %></dd>
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Phone Number</dt>
+          <dd class="text-sm text-gray-900 font-mono"><%= @call.contact.phone_number %></dd>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Email</dt>
+          <dd class="text-sm text-gray-900"><%= @call.contact.email || "Not provided" %></dd>
+        </div>
+
+        <!-- Contact ID -->
+        <div>
+          <dt class="text-sm font-medium text-gray-500 mb-1">Contact ID</dt>
+          <dd class="text-sm text-gray-900">#<%= @call.contact.id %></dd>
+        </div>
+      </dl>
+
+      <!-- Total Calls for this Contact -->
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-sm text-blue-800">
+          <span class="font-semibold">Total calls to this contact:</span> 
+          <%= @call.contact.calls.count %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-6 flex gap-4">
+    <%= link_to "Back to Dashboard", calls_path, class: "bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg transition" %>
+    
+    <% if @call.in_progress? || @call.queued? %>
+      <%= button_to "Cancel Call", cancel_call_path(@call), 
+          method: :post,
+          data: { confirm: "Are you sure you want to cancel this call?" },
+          class: "bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg transition" %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  // Auto-refresh call status every 5 seconds if call is in progress
+  <% if @call.in_progress? || @call.queued? %>
+    setInterval(function() {
+      fetch('/api/calls/<%= @call.id %>')
+        .then(response => response.json())
+        .then(data => {
+          // If status changed, reload the page
+          if (data.call.status !== '<%= @call.status %>') {
+            location.reload();
+          }
+        })
+        .catch(error => console.error('Error fetching call status:', error));
+    }, 5000);
+  <% end %>
+</script>

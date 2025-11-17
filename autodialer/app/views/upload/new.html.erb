@@ -1,0 +1,180 @@
+<div class="w-full">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Upload Contacts</h1>
+      <p class="text-sm text-gray-500 mt-1">Upload CSV file or paste data to queue calls</p>
+    </div>
+    <%= link_to calls_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Dashboard
+    <% end %>
+  </div>
+
+  <!-- Flash Messages -->
+  <% if flash[:alert] %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="ml-3 text-sm text-red-700"><%= flash[:alert] %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Upload Form Card -->
+      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Upload CSV File</h2>
+        </div>
+        
+        <div class="px-6 py-6">
+          <%= form_with url: upload_path, method: :post, multipart: true, class: "space-y-4" do |f| %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Select CSV File</label>
+              <%= f.file_field :csv_file, 
+                  accept: ".csv,text/csv",
+                  class: "block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 p-2" %>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Campaign ID</label>
+                <%= f.text_field :campaign_id, 
+                    placeholder: "summer-2024",
+                    class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 px-3 py-2" %>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                <%= f.text_field :tags, 
+                    placeholder: "vip, priority",
+                    class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 px-3 py-2" %>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Schedule Time</label>
+              <%= f.datetime_local_field :scheduled_at, 
+                  min: Time.current.strftime('%Y-%m-%dT%H:%M'),
+                  class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 px-3 py-2" %>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <%= f.submit "Upload and Queue", 
+                  class: "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Paste CSV Card -->
+      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Paste CSV Data</h2>
+        </div>
+        
+        <div class="px-6 py-6">
+          <%= form_with url: upload_path, method: :post, class: "space-y-4" do |f| %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">CSV Content</label>
+              <%= f.text_area :csv_text, 
+                  rows: 8,
+                  placeholder: "phone,name,email,message\n+18001234567,John Doe,john@example.com,Hello",
+                  class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 p-3 font-mono" %>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Campaign ID</label>
+                <%= f.text_field :campaign_id, 
+                    placeholder: "summer-2024",
+                    class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 px-3 py-2" %>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                <%= f.text_field :tags, 
+                    placeholder: "vip, priority",
+                    class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 px-3 py-2" %>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Schedule Time</label>
+              <%= f.datetime_local_field :scheduled_at, 
+                  min: Time.current.strftime('%Y-%m-%dT%H:%M'),
+                  class: "block w-full text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 px-3 py-2" %>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <%= f.submit "Process and Queue", 
+                  class: "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Instructions -->
+    <div class="space-y-6">
+      <!-- CSV Format -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-sm font-semibold text-gray-900">CSV Format</h3>
+        </div>
+        <div class="text-xs text-gray-600 space-y-2">
+          <p><strong>Required:</strong></p>
+          <p>• phone or phone_number<br/>E.164 format: +18001234567</p>
+          <p><strong>Optional:</strong></p>
+          <p>• name - Contact name<br/>• email - Contact email<br/>• message - Custom message</p>
+          <div class="mt-3 p-2 bg-gray-50 rounded border border-gray-200">
+            <pre class="text-xs font-mono">phone,name,message
++18001234567,John,Hi
++18009876543,Jane,Hello</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Limits -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-sm font-semibold text-gray-900">Limits</h3>
+        </div>
+        <div class="text-xs text-gray-600 space-y-1">
+          <p>• Max file size: 5MB</p>
+          <p>• Max rows: 1,000</p>
+          <p>• Max text paste: 1MB</p>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <h3 class="text-sm font-semibold text-gray-900">Tips</h3>
+        </div>
+        <div class="text-xs text-gray-600 space-y-1">
+          <p>• Leave schedule blank for immediate calls</p>
+          <p>• Use tags to organize contacts</p>
+          <p>• Campaign ID helps track performance</p>
+          <p>• Test with toll-free numbers first</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

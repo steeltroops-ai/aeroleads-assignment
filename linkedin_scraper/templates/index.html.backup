@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Profile Scraper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f9fafb;
+            min-height: 100vh;
+            color: #111827;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+            text-decoration: none;
+        }
+
+        .nav-brand i {
+            font-size: 1.25rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #111827;
+            background: #f9fafb;
+        }
+
+        .nav-link.active {
+            color: #111827;
+            background: #f3f4f6;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1280px;
+            margin: 5rem auto 2rem;
+            padding: 0 1.5rem 2rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #92400e;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.75rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: white;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1f2937;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #111827;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #111827;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* Results */
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            border: 1px solid;
+        }
+
+        .stat-card.total {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .stat-card.success {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            color: #065f46;
+        }
+
+        .stat-card.error {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Profile Cards */
+        .profile-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .profile-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: #d1d5db;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-headline {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-location {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .profile-url {
+            color: #111827;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .profile-url:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .profile-about {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            color: #4b5563;
+            line-height: 1.6;
+            font-size: 0.875rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .experiences {
+            margin-top: 1rem;
+        }
+
+        .experiences h4 {
+            color: #111827;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .experience-item {
+            padding: 1rem;
+            background: white;
+            border-left: 3px solid #111827;
+            margin-bottom: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+            border-left: 3px solid #111827;
+        }
+
+        .experience-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .experience-company {
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .experience-dates {
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        /* Error Cards */
+        .error-card {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-url {
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+        }
+
+        .export-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .profile-header {
+                flex-direction: column;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-primary {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-content">
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <a href="/" class="nav-brand">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn Scraper</span>
+                    </a>
+                    <div class="nav-links">
+                        <a href="/" class="nav-link active">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/health" class="nav-link">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>Health</span>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge">Development</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="card">
+            <div class="alert">
+                <strong>Important Notice</strong>
+                This tool is for educational purposes only. Scraping LinkedIn may violate their Terms of Service. Use
+                responsibly with test accounts only.
+            </div>
+
+            <div class="input-section">
+                <h2>Enter LinkedIn Profile URLs</h2>
+                <textarea id="urlInput"
+                    placeholder="Enter LinkedIn profile URLs (one per line)&#10;Example:&#10;https://www.linkedin.com/in/williamhgates&#10;https://www.linkedin.com/in/jeffweiner08"></textarea>
+                <div class="button-group">
+                    <button class="btn-primary" id="scrapeBtn" onclick="startScraping()">
+                        <i class="fas fa-play"></i>
+                        Start Scraping
+                    </button>
+                    <button class="btn-secondary" onclick="clearInput()">
+                        <i class="fas fa-trash"></i>
+                        Clear
+                    </button>
+                    <button class="btn-secondary" onclick="loadSample()">
+                        <i class="fas fa-file-alt"></i>
+                        Load Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Tab -->
+        <div id="authTab" class="tab-content">
+            <div class="input-section">
+                <h2>LinkedIn Authentication (Optional)</h2>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">
+                    Provide credentials to access private profiles or avoid rate limiting.
+                    <strong>Use test accounts only!</strong> Your credentials are only used for this session and not
+                    stored.
+                </p>
+
+                <div class="form-group">
+                    <label for="linkedinEmail">LinkedIn Email</label>
+                    <input type="email" id="linkedinEmail" placeholder="your-email@example.com" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="linkedinPassword">LinkedIn Password</label>
+                    <input type="password" id="linkedinPassword" placeholder="Your password" autocomplete="off">
+                </div>
+
+                <div class="auth-status" id="authStatus"></div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="testAuth()">
+                        <i class="fas fa-check-circle"></i>
+                        Test Connection
+                    </button>
+                    <button class="btn-secondary" onclick="clearAuth()">
+                        <i class="fas fa-times"></i>
+                        Clear Credentials
+                    </button>
+                </div>
+
+                <div class="info-box" style="margin-top: 1.5rem;">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>When to use authentication:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; font-size: 0.875rem;">
+                            <li>Accessing private profiles</li>
+                            <li>Scraping many profiles (reduces rate limiting)</li>
+                            <li>Getting more detailed information</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p class="loading-text">Scraping profiles... This may take a few moments.</p>
+        </div>
+
+        <div class="results" id="results">
+            <div class="divider"></div>
+            <h2>Results</h2>
+
+            <div class="stats">
+                <div class="stat-card total">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">Total URLs</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-number" id="successCount">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card error">
+                    <div class="stat-number" id="errorCount">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+            </div>
+
+            <div id="profilesContainer"></div>
+            <div id="errorsContainer"></div>
+
+            <div class="export-section">
+                <h3>Export Results</h3>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="exportData('csv')">
+                        <i class="fas fa-file-csv"></i>
+                        Export as CSV
+                    </button>
+                    <button class="btn-primary" onclick="exportData('json')">
+                        <i class="fas fa-file-code"></i>
+                        Export as JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        let scrapedProfiles = [];
+
+        function loadSample() {
+            document.getElementById('urlInput').value =
+                'https://www.linkedin.com/in/williamhgates\n' +
+                'https://www.linkedin.com/in/jeffweiner08\n' +
+                'https://www.linkedin.com/in/satyanadella';
+        }
+
+        function clearInput() {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('results').classList.remove('active');
+        }
+
+        async function startScraping() {
+            const input = document.getElementById('urlInput').value.trim();
+
+            if (!input) {
+                alert('Please enter at least one LinkedIn URL');
+                return;
+            }
+
+            const urls = input.split('\n')
+                .map(url => url.trim())
+                .filter(url => url.length > 0);
+
+            if (urls.length === 0) {
+                alert('Please enter valid URLs');
+                return;
+            }
+
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('scrapeBtn').disabled = true;
+
+            try {
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ urls: urls })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    scrapedProfiles = data.profiles;
+                    displayResults(data);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('scrapeBtn').disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('totalCount').textContent = data.total_urls;
+            document.getElementById('successCount').textContent = data.successful;
+            document.getElementById('errorCount').textContent = data.failed;
+
+            const profilesContainer = document.getElementById('profilesContainer');
+            profilesContainer.innerHTML = '';
+
+            if (data.profiles.length > 0) {
+                data.profiles.forEach(profile => {
+                    const card = createProfileCard(profile);
+                    profilesContainer.appendChild(card);
+                });
+            }
+
+            const errorsContainer = document.getElementById('errorsContainer');
+            errorsContainer.innerHTML = '';
+
+            if (data.errors.length > 0) {
+                const errorsTitle = document.createElement('h3');
+                errorsTitle.textContent = 'Errors';
+                errorsTitle.style.marginTop = '1.5rem';
+                errorsContainer.appendChild(errorsTitle);
+
+                data.errors.forEach(error => {
+                    const errorCard = createErrorCard(error);
+                    errorsContainer.appendChild(errorCard);
+                });
+            }
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        function createProfileCard(profile) {
+            const card = document.createElement('div');
+            card.className = 'profile-card';
+
+            let html = `
+                <div class="profile-header">
+                    <div>
+                        <div class="profile-name">${escapeHtml(profile.name)}</div>
+                        ${profile.headline ? `<div class="profile-headline">${escapeHtml(profile.headline)}</div>` : ''}
+                        ${profile.location ? `<div class="profile-location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(profile.location)}</div>` : ''}
+                    </div>
+                    <a href="${escapeHtml(profile.url)}" target="_blank" class="profile-url">
+                        View Profile <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            `;
+
+            if (profile.about) {
+                html += `
+                    <div class="profile-about">
+                        <strong>About:</strong><br>
+                        ${escapeHtml(profile.about)}
+                    </div>
+                `;
+            }
+
+            if (profile.experiences && profile.experiences.length > 0) {
+                html += '<div class="experiences"><h4>Experience</h4>';
+                profile.experiences.forEach(exp => {
+                    html += `
+                        <div class="experience-item">
+                            <div class="experience-title">${escapeHtml(exp.title)}</div>
+                            <div class="experience-company">${escapeHtml(exp.company)}</div>
+                            ${exp.start_date || exp.end_date ?
+                            `<div class="experience-dates">${escapeHtml(exp.start_date || 'N/A')} - ${escapeHtml(exp.end_date || 'Present')}</div>`
+                            : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            card.innerHTML = html;
+            return card;
+        }
+
+        function createErrorCard(error) {
+            const card = document.createElement('div');
+            card.className = 'error-card';
+            card.innerHTML = `
+                <div class="error-url"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(error.url)}</div>
+                <div class="error-message">${escapeHtml(error.error)}</div>
+            `;
+            return card;
+        }
+
+        async function exportData(format) {
+            if (scrapedProfiles.length === 0) {
+                alert('No profiles to export');
+                return;
+            }
+
+            try {
+                const response = await fetch('/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        profiles: scrapedProfiles,
+                        format: format
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `linkedin_profiles_${Date.now()}.${format}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Export failed');
+                }
+            } catch (error) {
+                alert('Export error: ' + error.message);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+
+</html>

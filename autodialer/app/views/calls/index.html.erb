@@ -1,0 +1,296 @@
+<div class="w-full">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+      <p class="text-sm text-gray-500 mt-1">Monitor and manage your calling campaigns</p>
+    </div>
+    <div class="flex gap-3">
+      <%= link_to upload_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+        </svg>
+        Upload Contacts
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  <% if flash[:notice] %>
+    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+      <div class="flex">
+        <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="ml-3 text-sm text-green-700"><%= flash[:notice] %></p>
+      </div>
+    </div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="ml-3 text-sm text-red-700"><%= flash[:alert] %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Total Calls -->
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Calls</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-2"><%= @total_calls %></p>
+        </div>
+        <div class="flex-shrink-0">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Calls -->
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Completed</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-2"><%= @completed_calls %></p>
+          <p class="text-xs text-gray-500 mt-1"><%= @success_rate %>% success rate</p>
+        </div>
+        <div class="flex-shrink-0">
+          <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Failed Calls -->
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Failed</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-2"><%= @failed_calls %></p>
+        </div>
+        <div class="flex-shrink-0">
+          <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Cost -->
+    <div class="bg-white border border-gray-200 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Cost</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-2">$<%= number_with_precision(@total_cost, precision: 2) %></p>
+        </div>
+        <div class="flex-shrink-0">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Prompt Section -->
+  <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+    <div class="flex items-center mb-4">
+      <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+      </svg>
+      <h2 class="text-lg font-semibold text-gray-900">AI Prompt</h2>
+    </div>
+    <p class="text-sm text-gray-500 mb-4">Use natural language to schedule calls. Example: "call +18001234567 with test message"</p>
+    
+    <%= form_with url: prompt_path, method: :post, class: "flex gap-3" do |f| %>
+      <%= f.text_field :prompt, 
+          placeholder: "call +18001234567 with hello world", 
+          class: "flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+          required: true %>
+      <%= f.submit "Process", 
+          class: "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <!-- Recent Calls Table -->
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Recent Calls</h2>
+    </div>
+    
+    <% if @recent_calls.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @recent_calls.each do |call| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900"><%= call.contact.name || "Unknown" %></div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900"><%= call.contact.phone_number %></div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% status_colors = {
+                    "pending" => "bg-gray-100 text-gray-800",
+                    "queued" => "bg-blue-100 text-blue-800",
+                    "in_progress" => "bg-yellow-100 text-yellow-800",
+                    "completed" => "bg-green-100 text-green-800",
+                    "failed" => "bg-red-100 text-red-800",
+                    "no_answer" => "bg-orange-100 text-orange-800",
+                    "busy" => "bg-purple-100 text-purple-800",
+                    "canceled" => "bg-gray-100 text-gray-800"
+                  } %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_colors[call.status] || 'bg-gray-100 text-gray-800' %>">
+                    <%= call.status.titleize %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= call.duration ? "#{call.duration}s" : "-" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= call.cost ? "$#{number_with_precision(call.cost, precision: 4)}" : "-" %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= time_ago_in_words(call.created_at) %> ago
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <%= link_to "View", call_path(call), class: "text-blue-600 hover:text-blue-900" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No calls yet</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by uploading contacts or using the AI prompt.</p>
+        <div class="mt-6">
+          <%= link_to "Upload Contacts", upload_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Status Legend -->
+  <div class="mt-6 bg-gray-50 rounded-lg p-4">
+    <div class="flex justify-between items-center mb-2">
+      <h3 class="text-sm font-medium text-gray-700">Status Information:</h3>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-600">Auto-refresh:</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+        <span id="last-update" class="text-xs text-gray-500"></span>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600">
+      <div><span class="font-semibold">Pending:</span> Waiting to be queued</div>
+      <div><span class="font-semibold">Queued:</span> In job queue</div>
+      <div><span class="font-semibold">In Progress:</span> Currently calling</div>
+      <div><span class="font-semibold">Completed:</span> Call successful</div>
+      <div><span class="font-semibold">Failed:</span> Call failed</div>
+      <div><span class="font-semibold">No Answer:</span> No one answered</div>
+      <div><span class="font-semibold">Busy:</span> Line was busy</div>
+      <div><span class="font-semibold">Canceled:</span> Call was canceled</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Real-time status updates using polling
+  let autoRefreshEnabled = true;
+  let refreshInterval;
+
+  function updateCallStatus() {
+    fetch('/api/calls/status')
+      .then(response => response.json())
+      .then(data => {
+        // Update statistics
+        updateStats(data.stats);
+        
+        // Update last refresh time
+        document.getElementById('last-update').textContent = 
+          'Updated ' + new Date(data.timestamp).toLocaleTimeString();
+        
+        // Optionally reload page if there are significant changes
+        // This is a simple implementation - could be enhanced to update specific rows
+        if (data.calls.some(call => call.status === 'in_progress')) {
+          // If there are calls in progress, refresh more frequently
+          console.log('Active calls detected, maintaining refresh');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching call status:', error);
+      });
+  }
+
+  function updateStats(stats) {
+    // Update stat cards if they exist
+    const statElements = {
+      total: document.querySelector('[data-stat="total"]'),
+      completed: document.querySelector('[data-stat="completed"]'),
+      failed: document.querySelector('[data-stat="failed"]'),
+      cost: document.querySelector('[data-stat="cost"]')
+    };
+
+    // This would update the stats in real-time
+    // For now, we'll just log them
+    console.log('Stats updated:', stats);
+  }
+
+  // Toggle auto-refresh
+  document.getElementById('auto-refresh-toggle').addEventListener('change', function() {
+    autoRefreshEnabled = this.checked;
+    if (autoRefreshEnabled) {
+      startAutoRefresh();
+    } else {
+      stopAutoRefresh();
+    }
+  });
+
+  function startAutoRefresh() {
+    // Update every 10 seconds
+    refreshInterval = setInterval(updateCallStatus, 10000);
+    updateCallStatus(); // Initial update
+  }
+
+  function stopAutoRefresh() {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+  }
+
+  // Start auto-refresh on page load
+  if (autoRefreshEnabled) {
+    startAutoRefresh();
+  }
+
+  // Clean up on page unload
+  window.addEventListener('beforeunload', stopAutoRefresh);
+</script>

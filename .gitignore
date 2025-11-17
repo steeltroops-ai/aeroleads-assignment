@@ -1,0 +1,191 @@
+# ============================================
+# IDEs and Editors
+# ============================================
+.idea/
+.vscode/
+.kiro/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Operating Systems
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Desktop.ini
+Thumbs.db
+$RECYCLE_BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ============================================
+# Python (LinkedIn Scraper)
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+*.mo
+*.pot
+venv/
+ENV/
+env/
+.venv
+
+# ============================================
+# Ruby on Rails (Autodialer)
+# ============================================
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+.dat
+.repl_history
+.bundle
+/vendor/bundle
+
+# Rails specific
+autodialer/log/*.log
+autodialer/tmp/*
+!autodialer/tmp/.keep
+!autodialer/tmp/pids/.keep
+!autodialer/tmp/cache/.keep
+!autodialer/tmp/sockets/.keep
+autodialer/db/*.sqlite3
+autodialer/db/*.sqlite3-*
+autodialer/public/system
+autodialer/public/uploads
+autodialer/storage/*
+!autodialer/storage/.keep
+autodialer/tmp/storage/*
+!autodialer/tmp/storage/.keep
+.byebug_history
+autodialer/config/master.key
+autodialer/config/credentials/*.key
+
+# ============================================
+# Node.js (AI Blog Generator)
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+pids
+*.pid
+*.seed
+*.pid.lock
+lib-cov
+coverage
+*.lcov
+.nyc_output
+.grunt
+bower_components
+.lock-wscript
+build/Release
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
+
+# Next.js
+.next/
+out/
+.cache/
+.parcel-cache/
+.vercel/
+.turbo/
+
+# ============================================
+# Environment Variables
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+*.env
+!.env.example
+
+# ============================================
+# Docker
+# ============================================
+.dockerignore
+docker-compose.override.yml
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+
+# ============================================
+# Application Specific
+# ============================================
+# LinkedIn Scraper
+linkedin_scraper/input_urls.txt
+linkedin_scraper/profiles.csv
+linkedin_scraper/profiles.json
+linkedin_scraper/output/*.csv
+linkedin_scraper/output/*.json
+
+# Autodialer
+autodialer/call_logs.json
+
+# AI Blog Generator
+ai_blog_generator/content/*.md
+!ai_blog_generator/content/.gitkeep
+
+# Test files
+test_numbers.csv

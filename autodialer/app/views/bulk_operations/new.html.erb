@@ -1,0 +1,237 @@
+<div class="w-full">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Bulk Operations</h1>
+      <p class="text-sm text-gray-500 mt-1">Manage multiple contacts at once</p>
+    </div>
+    <%= link_to calls_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Dashboard
+    <% end %>
+  </div>
+
+  <!-- Flash Messages -->
+  <% if flash[:notice] %>
+    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+      <div class="flex">
+        <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="ml-3 text-sm text-green-700"><%= flash[:notice] %></p>
+      </div>
+    </div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="ml-3 text-sm text-red-700"><%= flash[:alert] %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Operations -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Add Tags -->
+        <div class="bg-white border border-gray-200 rounded-lg p-5">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Add Tags</h2>
+          <%= form_with url: bulk_operations_path, method: :post, class: "space-y-3" do |f| %>
+            <%= f.hidden_field :operation, value: 'add_tag' %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tag Name</label>
+              <%= f.text_field :tag, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500", placeholder: "vip, priority" %>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Campaign</label>
+              <%= f.select :campaign_id, options_for_select([['All', '']] + @campaigns.map { |c| [c, c] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <%= f.submit "Add Tag", class: "w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+          <% end %>
+        </div>
+
+        <!-- Remove Tags -->
+        <div class="bg-white border border-gray-200 rounded-lg p-5">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Remove Tags</h2>
+          <%= form_with url: bulk_operations_path, method: :post, class: "space-y-3" do |f| %>
+            <%= f.hidden_field :operation, value: 'remove_tag' %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tag Name</label>
+              <%= f.select :tag, options_for_select([['Select', '']] + @all_tags.map { |t| [t, t] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Campaign</label>
+              <%= f.select :campaign_id, options_for_select([['All', '']] + @campaigns.map { |c| [c, c] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <%= f.submit "Remove Tag", class: "w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+          <% end %>
+        </div>
+
+        <!-- Change Status -->
+        <div class="bg-white border border-gray-200 rounded-lg p-5">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Change Status</h2>
+          <%= form_with url: bulk_operations_path, method: :post, class: "space-y-3" do |f| %>
+            <%= f.hidden_field :operation, value: 'change_status' %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">New Status</label>
+              <%= f.select :new_status, options_for_select(Contact.statuses.keys.map { |s| [s.titleize, s] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Tag</label>
+              <%= f.select :tag, options_for_select([['All', '']] + @all_tags.map { |t| [t, t] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <%= f.submit "Change Status", class: "w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+          <% end %>
+        </div>
+
+        <!-- Schedule Calls -->
+        <div class="bg-white border border-gray-200 rounded-lg p-5">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Schedule Calls</h2>
+          <%= form_with url: bulk_operations_path, method: :post, class: "space-y-3" do |f| %>
+            <%= f.hidden_field :operation, value: 'schedule_calls' %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Schedule Time</label>
+              <%= f.datetime_local_field :scheduled_at, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500", min: Time.current.strftime('%Y-%m-%dT%H:%M') %>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+              <%= f.text_area :message, rows: 2, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500", placeholder: "Call message" %>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Campaign</label>
+              <%= f.select :campaign_id, options_for_select([['All', '']] + @campaigns.map { |c| [c, c] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <%= f.submit "Schedule Calls", class: "w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+          <% end %>
+        </div>
+
+        <!-- Export Contacts -->
+        <div class="bg-white border border-gray-200 rounded-lg p-5">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Export Contacts</h2>
+          <%= form_with url: bulk_operations_path, method: :post, class: "space-y-3" do |f| %>
+            <%= f.hidden_field :operation, value: 'export' %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Campaign</label>
+              <%= f.select :campaign_id, options_for_select([['All', '']] + @campaigns.map { |c| [c, c] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tag</label>
+              <%= f.select :tag, options_for_select([['All', '']] + @all_tags.map { |t| [t, t] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <%= f.submit "Export CSV", class: "w-full px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+          <% end %>
+        </div>
+
+        <!-- Delete Contacts -->
+        <div class="bg-white border border-gray-200 rounded-lg p-5">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Delete Contacts</h2>
+          <%= form_with url: bulk_operations_path, method: :post, class: "space-y-3", data: { confirm: 'Are you sure? This will permanently delete contacts and call history.' } do |f| %>
+            <%= f.hidden_field :operation, value: 'delete' %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Campaign</label>
+              <%= f.select :campaign_id, options_for_select([['Select', '']] + @campaigns.map { |c| [c, c] }), {}, class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" %>
+            </div>
+            <%= f.submit "Delete Contacts", class: "w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition cursor-pointer" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Recent Contacts Preview -->
+      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Recent Contacts</h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Campaign</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @contacts.each do |contact| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= contact.name || 'Unknown' %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= contact.phone_number %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full <%= contact.active? ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' %>">
+                      <%= contact.status.titleize %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= contact.campaign_id || '—' %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900">
+                    <% if contact.tags.any? %>
+                      <% contact.tags.each do |tag| %>
+                        <span class="inline-block px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded mr-1"><%= tag %></span>
+                      <% end %>
+                    <% else %>
+                      —
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="space-y-6">
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-sm font-semibold text-gray-900">Operations</h3>
+        </div>
+        <div class="text-xs text-gray-600 space-y-2">
+          <p>• Add/remove tags for organization</p>
+          <p>• Change contact status in bulk</p>
+          <p>• Schedule multiple calls at once</p>
+          <p>• Export filtered contacts to CSV</p>
+          <p>• Delete contacts by campaign</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+          </svg>
+          <h3 class="text-sm font-semibold text-gray-900">Filters</h3>
+        </div>
+        <div class="text-xs text-gray-600 space-y-2">
+          <p>• Use campaign filter to target specific groups</p>
+          <p>• Tag filter helps narrow operations</p>
+          <p>• Leave filters blank to affect all contacts</p>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <div class="flex items-center mb-3">
+          <svg class="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <h3 class="text-sm font-semibold text-gray-900">Tips</h3>
+        </div>
+        <div class="text-xs text-gray-600 space-y-2">
+          <p>• Operations apply to filtered contacts only</p>
+          <p>• Delete action cannot be undone</p>
+          <p>• Export creates downloadable CSV file</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
