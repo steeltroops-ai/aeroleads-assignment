@@ -5,7 +5,7 @@
 
 const https = require('https');
 
-const API_KEY = 'AIzaSyCi7YSbLlmWUTYAuTNhVOQGp_Ta9KEogXU';
+const API_KEY = process.env.GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
 const MODEL = 'gemini-pro'; // or try 'gemini-1.5-pro' or just 'gemini-pro'
 
 console.log('\n🧪 Testing Gemini API Key Directly...\n');

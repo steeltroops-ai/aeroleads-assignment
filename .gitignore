@@ -157,6 +157,12 @@ out/
 .env*.local
 *.env
 !.env.example
+!**/.env.example
+
+# Specific .env files
+linkedin_scraper/.env
+autodialer/.env
+ai_blog_generator/.env
 
 # ============================================
 # Docker
@@ -179,13 +185,21 @@ linkedin_scraper/profiles.csv
 linkedin_scraper/profiles.json
 linkedin_scraper/output/*.csv
 linkedin_scraper/output/*.json
+linkedin_scraper/src/linkedin_scraper.egg-info/
+linkedin_scraper/**/*.backup
 
 # Autodialer
 autodialer/call_logs.json
+autodialer/config/master.key
+autodialer/log/*.log
+autodialer/tmp/restart.txt
 
 # AI Blog Generator
 ai_blog_generator/content/*.md
 !ai_blog_generator/content/.gitkeep
+ai_blog_generator/test-*.js
+!ai_blog_generator/tests/
 
 # Test files
 test_numbers.csv
+**/test_*.csv

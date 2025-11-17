@@ -5,7 +5,7 @@
 
 const https = require('https');
 
-const API_KEY = 'AIzaSyC8dBygQBC0zzX5Qiewxat-hYBZsZJT6U0';
+const API_KEY = process.env.GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
 
 console.log('\n🔍 Checking Gemini API Configuration...\n');
 console.log(`Project: Generative Language Client`);
